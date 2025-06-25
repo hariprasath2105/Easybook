@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<section class="profile-section">
+    <div class="profile-header">
+        <h2>Your Profile</h2>
+        <div class="user-info">
+            <div class="avatar">
+                <i class="fas fa-user-circle"></i>
+            </div>
+            <div class="details">
+                <h3>{{ user.name }}</h3>
+                <p>{{ user.email }}</p>
+                <p>Roll No: {{ user.roll_no }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bookings-history">
+        <h3>Your Bookings</h3>
+        
+        {% if not bookings %}
+            <p class="no-bookings">You don't have any bookings yet.</p>
+        {% else %}
+            <div class="bookings-list">
+                {% for booking in bookings %}
+                <div class="booking-card {{ booking.status }}">
+                    <div class="booking-header">
+                        <span class="token">{{ booking.token }}</span>
+                        <span class="status">{{ booking.status|capitalize }}</span>
+                    </div>
+                    <div class="booking-details">
+                        <p><i class="fas fa-calendar-alt"></i> {{ booking.date.strftime('%Y-%m-%d') }} at {{ booking.time }}</p>
+                        <p><i class="fas fa-money-bill-wave"></i> {{ booking.counter_id.name }} ({{ booking.counter_id.type|capitalize }})</p>
+                    </div>
+                    {% if booking.status == 'booked' %}
+                    <div class="booking-actions">
+                        <form method="POST" action="{{ url_for('cancel_booking', booking_id=booking.id) }}">
+                            <button type="submit" class="btn btn-danger">Cancel Booking</button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

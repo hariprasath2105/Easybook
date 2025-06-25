@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Counters{% endblock %}
+
+{% block content %}
+<section class="counters-section">
+    <h2>Available Counters</h2>
+    <p class="subtitle">Select a counter to book your fee payment slot</p>
+    
+    <div class="counters-grid">
+        {% for counter in counters %}
+        <div class="counter-card" onclick=window.location.href="{{ url_for('book', counter_id=counter.id) }}">
+            <div class="counter-header">
+                <h3>{{ counter.name }}</h3>
+                <span class="counter-type {{ counter.type }}">{{ counter.type|capitalize }}</span>
+            </div>
+            
+            <div class="counter-stats">
+                <div class="stat available">
+                    <span class="stat-value">{{ counter.available_slots }}</span>
+                    <span class="stat-label">Available</span>
+                </div>
+                
+                <div class="stat booked">
+                    <span class="stat-value">{{ counter.booked_slots }}</span>
+                    <span class="stat-label">Booked</span>
+                </div>
+                
+                <div class="stat total">
+                    <span class="stat-value">{{ counter.available_slots + counter.booked_slots }}</span>
+                    <span class="stat-label">Total</span>
+                </div>
+            </div>
+            
+            <div class="counter-status">
+                {% set total_slots = counter.available_slots + counter.booked_slots %}
+                {% set availability_pct = (counter.available_slots / total_slots * 100) if total_slots > 0 else 0 %}
+                
+                <div class="status-bar">
+                    <div class="available-bar" style="width: availability_pct"></div>
+                </div>
+                <span class="status-text">
+                    {{ availability_pct | round(1) }}% available
+                </span>
+            </div>
+            
+            <div class="counter-footer">
+                <button class="btn btn-primary">Book Slot</button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-refresh counters every 30 seconds
+    setInterval(function() {
+        fetch(window.location.href, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const newDoc = parser.parseFromString(html, 'text/html');
+            const newCounters = newDoc.querySelector('.counters-grid').innerHTML;
+            document.querySelector('.counters-grid').innerHTML = newCounters;
+        })
+        .catch(error => console.error('Error refreshing counters:', error));
+    }, 30000);
+});
+</script>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-content">
+        <h2>Smart Fee Payment Scheduling System</h2>
+        <p>Book your fee payment slot online and avoid long queues</p>
+        <div class="hero-buttons">
+            {% if 'user_id' not in session %}
+                <a href="{{ url_for('register') }}" class="btn btn-primary">Register Now</a>
+                <a href="{{ url_for('login') }}" class="btn btn-secondary">Login</a>
+            {% else %}
+                <a href="{{ url_for('counters') }}" class="btn btn-primary">Book a Slot</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<section class="features">
+    <h2>Key Features</h2>
+    <div class="feature-grid">
+        <div class="feature-card">
+            <i class="fas fa-clock"></i>
+            <h3>Real-time Tracking</h3>
+            <p>Track your slot status in real-time and get updates instantly.</p>
+        </div>
+        <div class="feature-card">
+            <i class="fas fa-calendar-check"></i>
+            <h3>Easy Slot Booking</h3>
+            <p>Simple and intuitive interface to book your preferred time slot.</p>
+        </div>
+        <div class="feature-card">
+            <i class="fas fa-wallet"></i>
+            <h3>Hassle-free Payment</h3>
+            <p>Pay your fees without waiting in long queues at the counter.</p>
+        </div>
+        <div class="feature-card">
+            <i class="fas fa-bell"></i>
+            <h3>Notifications</h3>
+            <p>Get reminders and confirmations for your booked slots.</p>
+        </div>
+        <div class="feature-card">
+            <i class="fas fa-robot"></i>
+            <h3>Student Support</h3>
+            <p>24/7 chatbot support to answer your queries about the system.</p>
+        </div>
+        <div class="feature-card">
+            <i class="fas fa-mobile-alt"></i>
+            <h3>Mobile Friendly</h3>
+            <p>Access the system from any device, anytime, anywhere.</p>
+        </div>
+    </div>
+</section>
+{% endblock %}

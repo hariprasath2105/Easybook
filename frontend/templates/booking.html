@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Book Slot{% endblock %}
+
+{% block content %}
+<section class="booking-section">
+    <h2>Book Your Slot - {{ counter.name }} ({{ counter.type|capitalize }})</h2>
+    
+    <div class="booking-container">
+        <div class="date-picker">
+            <label for="booking-date">Select Date:</label>
+            <input type="date" id="booking-date" value="{{ selected_date }}" min="{{ datetime.now().strftime('%Y-%m-%d') }}">
+        </div>
+        
+        <div class="time-slots">
+            <h3>Available Time Slots</h3>
+            <p>Each slot is 15 minutes long. Break time from 12:00 PM to 1:00 PM.</p>
+            
+            <div class="slots-grid" id="slots-container">
+                {% for slot in time_slots %}
+                    {% if slot.available %}
+                        <div class="slot available" data-time="{{ slot.time }}">
+                            {{ slot.time }}
+                        </div>
+                    {% else %}
+                        <div class="slot booked">
+                            {{ slot.time }}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div class="booking-form" id="booking-form" style="display: none;">
+            <h3>Confirm Your Booking</h3>
+            <form method="POST" action="{{ url_for('book', counter_id=counter.id) }}">
+                <input type="hidden" name="slot_time" id="slot-time">
+                <input type="hidden" name="date" id="selected-date" value="{{ selected_date }}">
+                
+                <div class="form-group">
+                    <label>Name:</label>
+                    <p>{{ session.name }}</p>
+                </div>
+                <div class="form-group">
+                    <label>Roll No:</label>
+                    <p>{{ session.roll_no }}</p>
+                </div>
+                <div class="form-group">
+                    <label>Email:</label>
+                    <p>{{ session.email }}</p>
+                </div>
+                <div class="form-group">
+                    <label>Selected Slot:</label>
+                    <p id="selected-slot-display"></p>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Confirm Booking</button>
+                <button type="button" id="cancel-booking" class="btn btn-secondary">Cancel</button>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const datePicker = document.getElementById('booking-date');
+        const slotsContainer = document.getElementById('slots-container');
+        const bookingForm = document.getElementById('booking-form');
+        const slotTimeInput = document.getElementById('slot-time');
+        const selectedSlotDisplay = document.getElementById('selected-slot-display');
+        const selectedDateInput = document.getElementById('selected-date');
+        const cancelButton = document.getElementById('cancel-booking');
+        
+        // Date picker change handler
+        datePicker.addEventListener('change', function() {
+            const selectedDate = this.value;
+            window.location.href = `{{ url_for('book', counter_id=counter.id) }}?date=${selectedDate}`;
+        });
+        
+        // Slot click handler
+        document.querySelectorAll('.slot.available').forEach(slot => {
+            slot.addEventListener('click', function() {
+                const time = this.getAttribute('data-time');
+                const date = selectedDateInput.value;
+                
+                slotTimeInput.value = time;
+                selectedSlotDisplay.textContent = `${date} at ${time}`;
+                
+                // Show the booking form
+                bookingForm.style.display = 'block';
+                
+                // Scroll to the form
+                bookingForm.scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+        
+        // Cancel booking handler
+        cancelButton.addEventListener('click', function() {
+            bookingForm.style.display = 'none';
+        });
+    });
+</script>
+{% endblock %}
